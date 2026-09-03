@@ -57,7 +57,7 @@ with col2:
             try:
                 prompt = f"Analyze the following submission against the rubric.\nRUBRIC:\n{rubric_input}\nSUBMISSION:\n{submission_input}"
                 response = client.models.generate_content(
-                    model='gemini-1.5-flash',
+                    model='gemini-3.5-flash',
                     contents=prompt,
                     config=types.GenerateContentConfig(
                         response_mime_type="application/json",
