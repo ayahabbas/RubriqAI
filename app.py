@@ -7,8 +7,67 @@ from pydantic import BaseModel, Field
 
 # 1. Page Config
 st.set_page_config(page_title="Rubriq AI", page_icon="🎓", layout="wide")
-st.title("🎓 Rubriq AI")
-st.caption("Automated Rubric Evaluation & Adaptive Feedback Engine")
+
+# Custom Visual Styling Injection
+st.markdown("""
+<style>
+    /* Dark Theme Background */
+    .stApp {
+        background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+        color: #f8fafc;
+    }
+    
+    /* Title Styling */
+    .main-title {
+        font-size: 2.6rem;
+        font-weight: 800;
+        background: linear-gradient(90deg, #6366f1, #a855f7, #ec4899);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 0px;
+    }
+    .sub-title {
+        color: #94a3b8;
+        font-size: 1.05rem;
+        margin-bottom: 25px;
+    }
+    
+    /* Score Metric Box */
+    .metric-card {
+        background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), rgba(168, 85, 247, 0.2));
+        border: 1px solid rgba(168, 85, 247, 0.4);
+        border-radius: 14px;
+        padding: 16px;
+        text-align: center;
+        margin-bottom: 15px;
+    }
+    .metric-value {
+        font-size: 2.8rem;
+        font-weight: 800;
+        color: #38bdf8;
+    }
+    .metric-label {
+        font-size: 0.85rem;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #cbd5e1;
+    }
+
+    /* Gradient Primary Button */
+    .stButton>button {
+        background: linear-gradient(90deg, #6366f1, #a855f7) !important;
+        color: white !important;
+        font-weight: 700 !important;
+        border-radius: 10px !important;
+        border: none !important;
+        padding: 10px 20px !important;
+        box-shadow: 0 4px 14px rgba(168, 85, 247, 0.4) !important;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+st.markdown('<div class="main-title">🎓 Rubriq AI</div>', unsafe_allow_html=True)
+st.markdown('<div class="sub-title">Automated Rubric Evaluation & Adaptive Feedback Engine</div>', unsafe_allow_html=True)
 
 # Sidebar for API Key
 st.sidebar.header("Settings")
@@ -71,13 +130,35 @@ with col2:
 
     if 'eval_result' in st.session_state:
         res = st.session_state['eval_result']
-        st.metric("Overall Score", f"{res.overall_score} / 100")
+        
+        # Styled Score Card
+        st.markdown(f"""
+        <div class="metric-card">
+            <div class="metric-label">Overall Score</div>
+            <div class="metric-value">{res.overall_score} / 100</div>
+        </div>
+        """, unsafe_allow_html=True)
+        
         st.write(f"**Summary:** {res.summary}")
 
-        # Score Bar Chart
+        # Score Bar Chart with Gradient Coloring & Transparent Background
         names = [c.criterion_name for c in res.criteria_breakdown]
         scores = [c.score for c in res.criteria_breakdown]
-        fig = px.bar(x=names, y=scores, labels={'x':'Criteria', 'y':'Score'}, range_y=[0, 100])
+        fig = px.bar(
+            x=names, 
+            y=scores, 
+            labels={'x':'Criteria', 'y':'Score'}, 
+            range_y=[0, 100],
+            color=scores,
+            color_continuous_scale=["#ef4444", "#f59e0b", "#10b981"]
+        )
+        fig.update_layout(
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',
+            font=dict(color='#cbd5e1'),
+            coloraxis_showscale=False,
+            height=280
+        )
         st.plotly_chart(fig, use_container_width=True)
 
         # Strengths & Gaps
